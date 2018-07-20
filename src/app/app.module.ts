@@ -8,6 +8,7 @@ import firebase from 'firebase';
 import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
+import { FeedPage } from '../pages/feed/feed';
 
 
   // Initialize Firebase
@@ -20,12 +21,14 @@ import { SignupPage } from '../pages/signup/signup';
     messagingSenderId: "903923686423"
   };
   firebase.initializeApp(config);
+  firebase.firestore().settings({ timestampsInSnapshots: true });
 
 @NgModule({
   declarations: [
     MyApp,
     LoginPage,
-    SignupPage
+    SignupPage,
+    FeedPage
   ],
   imports: [
     BrowserModule,
@@ -35,7 +38,8 @@ import { SignupPage } from '../pages/signup/signup';
   entryComponents: [
     MyApp,
     LoginPage,
-    SignupPage
+    SignupPage,
+    FeedPage
   ],
   providers: [
     StatusBar,
