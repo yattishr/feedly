@@ -12,7 +12,10 @@ export class FeedPage {
   posts: any[] = [];
   pageSize: number = 10;
   cursor: any; // used to record the number of posts that have been retrieved from firestore.
+  infiniteEvent: any;
   currentLoggedUser: string = "Tony";
+
+
   constructor(public navCtrl: NavController, public navParams: NavParams) {
     this.getPosts();
   }
@@ -52,24 +55,26 @@ export class FeedPage {
   }
 
   loadMorePosts(event) {
-    this.posts = []; // initialize the posts array to blank.
-    firebase.firestore().collection("posts").orderBy("created","desc").startAfter(this.cursor).limit(this.pageSize).get()
+    firebase.firestore().collection("posts").orderBy("created", "desc").startAfter(this.cursor).limit(this.pageSize).get()
     .then((docs) => {
+
       docs.forEach((doc) => {
         this.posts.push(doc);
       })
-      console.log(this.posts); 
 
-      if(docs.size < this.pageSize) {
-        // all documents have been loaded.
+      console.log(this.posts)
+
+      if (docs.size < this.pageSize) {
+        // all documents have been loaded
         event.enable(false);
+        this.infiniteEvent = event;
       } else {
         event.complete();
         this.cursor = this.posts[this.posts.length - 1];
       }
 
     }).catch((err) => {
-      console.log(err);
+      console.log(err)
     })
 
   }
