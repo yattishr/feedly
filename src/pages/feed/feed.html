@@ -3,7 +3,7 @@
   <ion-navbar color="danger">
     <ion-title>Your Feed</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only clear>
+      <button ion-button icon-only clear (click)="logout();">
         <ion-icon name="log-out"></ion-icon>
       </button>
     </ion-buttons>    
@@ -55,7 +55,7 @@
       </ion-col>      
       <ion-col>
         <button ion-button block icon-left clear small color="danger" class="border-right">
-          <small>{{ ago(post.data().created.toDate()) }} ago</small>
+          <small *ngIf="post.data().created">{{ ago(post.data().created.toDate()) }} ago</small>                 
         </button>        
       </ion-col>            
     </ion-row>

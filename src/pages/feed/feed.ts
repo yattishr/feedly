@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 import firebase from 'firebase';
 import moment from 'moment';
+import { query } from '@angular/core/src/animation/dsl';
+import { LoginPage } from '../login/login';
 
 @Component({
   selector: 'page-feed',
@@ -16,7 +18,11 @@ export class FeedPage {
   currentLoggedUser: string = "Tony";
 
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, 
+              public navParams: NavParams, 
+              private loadingCrtl: LoadingController, 
+              private toastCtrl: ToastController) 
+  {
     this.getPosts();
   }
 
@@ -28,10 +34,43 @@ export class FeedPage {
   // retrieve the posts from firestore and order posts by created descending order.
   getPosts() {
     this.posts = []; // initialize the posts array to blank.
-    firebase.firestore().collection("posts").orderBy("created","desc").limit(this.pageSize).get().then((docs) => {
+
+    let loading = this.loadingCrtl.create({
+      content: "Loading Feed..."
+    });
+    loading.present();
+
+
+
+    let query = firebase.firestore().collection("posts").orderBy("created","desc")
+    .limit(this.pageSize);
+
+    // onSnapShot is called everytime some data is changed in the resultset of your query.
+    query.onSnapshot((snapshot) => {
+      console.log("Changed...");
+      let changedDocs = snapshot.docChanges();
+      changedDocs.forEach((change) => {
+        // if(change.type == "added") {
+        //   console.log("Document with id " + change.doc.id + " has been added.");
+        // }
+        if(change.type == "modified") {
+          console.log("Document with id " + change.doc.id + " has been modified.");
+        }
+        // if(change.type == "removed") {
+        //   console.log("Document with id " + change.doc.id + " has been removed.");          
+        // }        
+
+      })
+    })
+
+    query.get()
+    .then((docs) => {
+
       docs.forEach((doc) => {
         this.posts.push(doc);
       })
+      loading.dismiss();
+
     this.cursor = this.posts[this.posts.length - 1];      
     }).catch((err) => {
       console.log(err);
@@ -48,6 +87,13 @@ export class FeedPage {
       owner_name: firebase.auth().currentUser.displayName
     }).then((doc) => {
       console.log(doc);
+      this.text = "";
+
+      let toast = this.toastCtrl.create({
+        message: "Your post has been created successfully.",
+        duration: 3000
+      }).present();
+
       this.getPosts();
     }).catch((err) => {
       console.log(err);
@@ -93,7 +139,18 @@ export class FeedPage {
     event.complete();
   }
 
-  // convert the time intohuman readable form for display.
+
+  logout() {
+    firebase.auth().signOut().then(() => {
+      this.navCtrl.setRoot(LoginPage);
+      let toast = this.toastCtrl.create({
+        message: "You have been successfully logged out.",
+        duration: 3000
+      }).present();      
+    });
+  }
+
+  // convert the time into human readable form for display.
   ago(time) {
     let difference = moment(time).diff(moment());
     return moment.duration(difference).humanize();
