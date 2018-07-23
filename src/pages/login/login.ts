@@ -12,7 +12,7 @@ import { FeedPage } from '../feed/feed';
 })
 export class LoginPage {
 
-  email: string = "yattishr@hotmail.com";
+  email: string = "tony@hotmail.com";
   password: string = "12345678";
 
   constructor(public navCtrl: NavController, public toastCtrl: ToastController) {

@@ -10,7 +10,7 @@ import moment from 'moment';
 export class FeedPage {
   text: string = "";
   posts: any[] = [];
-  pageSize: number = 10;
+  pageSize: number = 5;
   cursor: any; // used to record the number of posts that have been retrieved from firestore.
   infiniteEvent: any;
   currentLoggedUser: string = "Tony";
@@ -77,6 +77,20 @@ export class FeedPage {
       console.log(err)
     })
 
+  }
+
+  refresh(event) {
+
+    this.posts = [];
+
+    // call the getPosts function to load the Posts
+    this.getPosts();
+
+    if (this.infiniteEvent) {
+      this.infiniteEvent.enable(true);
+    }
+
+    event.complete();
   }
 
   // convert the time intohuman readable form for display.
