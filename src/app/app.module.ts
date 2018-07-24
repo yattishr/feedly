@@ -9,6 +9,7 @@ import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { FeedPage } from '../pages/feed/feed';
+import { Camera } from '@ionic-native/camera';
 
 
   // Initialize Firebase
@@ -44,6 +45,7 @@ import { FeedPage } from '../pages/feed/feed';
   providers: [
     StatusBar,
     SplashScreen,
+    Camera,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

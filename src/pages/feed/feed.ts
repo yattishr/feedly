@@ -4,6 +4,7 @@ import firebase from 'firebase';
 import moment from 'moment';
 import { query } from '@angular/core/src/animation/dsl';
 import { LoginPage } from '../login/login';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 
 @Component({
   selector: 'page-feed',
@@ -21,7 +22,8 @@ export class FeedPage {
   constructor(public navCtrl: NavController, 
               public navParams: NavParams, 
               private loadingCrtl: LoadingController, 
-              private toastCtrl: ToastController) 
+              private toastCtrl: ToastController,
+              private camera: Camera) 
   {
     this.getPosts();
   }
@@ -148,6 +150,30 @@ export class FeedPage {
         duration: 3000
       }).present();      
     });
+  }
+
+
+  addPhoto() {
+    this.launchCamera();
+  }
+
+  launchCamera() {
+      let options: CameraOptions = {
+      quality: 100,
+      sourceType: this.camera.PictureSourceType.CAMERA,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.PNG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation: true,
+      targetHeight: 512,
+      targetWidth: 512,
+      allowEdit: true
+    }
+    this.camera.getPicture(options).then((base64Image) => {
+      console.log(base64Image)
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 
   // convert the time into human readable form for display.
