@@ -29,6 +29,11 @@
           <ion-input type="password" placeholder="your password" [(ngModel)]="password"></ion-input>
       </ion-row>
 
+      <ion-item class="rowStyle">
+        <ion-icon name="contact" color="dark"></ion-icon>
+        <ion-datetime displayFormat="MMM DD, YYYY HH:mm" [(ngModel)]="myDate"></ion-datetime>
+      </ion-item>
+
       <ion-row>
         <button ion-button block round outline color="light" style="margin-top: 20px;" (click)="signup();">Sign Up</button>
       </ion-row>

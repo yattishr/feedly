@@ -25,6 +25,12 @@
     </button>    
   </ion-row>
 
+  <ion-row margin class="rowStyle" *ngIf="image">
+    <ion-card class="round-corners">
+      <img [src]="image" class="round-corners">
+    </ion-card>
+  </ion-row>
+
   <ion-refresher (ionRefresh)="refresh($event)">
     <ion-refresher-content>
 
@@ -39,6 +45,8 @@
     <ion-item text-wrap>
       {{ post.data().text }}
     </ion-item>
+
+    <img [src]="post.data().image" *ngIf="post.data().image">
 
     <ion-row class="bottom-bar">
       <ion-col>
