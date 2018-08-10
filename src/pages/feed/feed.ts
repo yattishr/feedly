@@ -5,6 +5,7 @@ import moment from 'moment';
 import { query } from '@angular/core/src/animation/dsl';
 import { LoginPage } from '../login/login';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'page-feed',
@@ -24,7 +25,8 @@ export class FeedPage {
               public navParams: NavParams, 
               private loadingCrtl: LoadingController, 
               private toastCtrl: ToastController,
-              private camera: Camera) 
+              private camera: Camera,
+              private http: HttpClient) 
   {
     this.getPosts();
   }
@@ -45,23 +47,27 @@ export class FeedPage {
 
 
 
-    let query = firebase.firestore().collection("posts").orderBy("created","desc")
-    .limit(this.pageSize);
+    let query = firebase.firestore().collection("posts").orderBy("created","desc").limit(this.pageSize);
 
     // onSnapShot is called everytime some data is changed in the resultset of your query.
     query.onSnapshot((snapshot) => {
       console.log("Changed...");
       let changedDocs = snapshot.docChanges();
       changedDocs.forEach((change) => {
-        // if(change.type == "added") {
-        //   console.log("Document with id " + change.doc.id + " has been added.");
-        // }
-        if(change.type == "modified") {
-          console.log("Document with id " + change.doc.id + " has been modified.");
+        if(change.type == "added") {
+          console.log("Document with id " + change.doc.id + " has been added.");
         }
-        // if(change.type == "removed") {
-        //   console.log("Document with id " + change.doc.id + " has been removed.");          
-        // }        
+        if(change.type == "modified") {
+          // console.log("Document with id " + change.doc.id + " has been modified.");
+          for(let i = 0; i < this.posts.length; i++) {
+            if(this.posts[i].id == change.doc.id) {
+              this.posts[i] == change.doc;
+            }
+          }
+        }
+        if(change.type == "removed") {
+          console.log("Document with id " + change.doc.id + " has been removed.");          
+        }        
 
       })
     })
@@ -130,6 +136,23 @@ export class FeedPage {
       console.log(err)
     })
 
+  }
+
+  // function for updating the post Likes. makes use of Firebase updateLikes function.
+  like(post) {
+    let body = {
+      postId: post.id,
+      userId: firebase.auth().currentUser.uid,
+      action: post.data().likes && post.data().likes[firebase.auth().currentUser.uid] == true ? "unlike": "like",
+    }
+    const urlString = "https://us-central1-feedlyapp-a4d0b.cloudfunctions.net/updateLikesCount";
+    this.http.post(urlString, JSON.stringify(body), {
+      responseType: "text"
+    }).subscribe((data) => {
+      console.log(data);
+    }, (error) => {
+      console.log(error);
+    })
   }
 
   refresh(event) {
