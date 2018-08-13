@@ -57,7 +57,7 @@ export const updateLikesCount = functions.https.onRequest((request, response) =>
 
         const updateData = {};
 
-        if(action == "like"){
+        if(action === "like"){
             updateData["likesCount"] = ++likesCount;
             updateData[`likes.${userId}`] = true;
         } else {
@@ -67,7 +67,7 @@ export const updateLikesCount = functions.https.onRequest((request, response) =>
 
         admin.firestore().collection("posts").doc(postId).update(updateData).then(async () => {
 
-            if(action == "like"){
+            if(action === "like"){
                 await sendNotification(data.data().owner, "new_like");
             }
 
@@ -96,8 +96,8 @@ export const updateCommentsCount = functions.firestore.document('comments/{comme
         await admin.firestore().collection("posts").doc(postId).update({
             "commentsCount": commentsCount
         })
-
-        return sendNotification(doc.data().owner, "new_comment");;
+        console.log("this is my comments count: ", commentsCount)
+        return true;
 
     } else {
         return false;

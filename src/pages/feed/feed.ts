@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController, ActionSheetController, AlertController } from 'ionic-angular';
 import firebase from 'firebase';
 import moment from 'moment';
 import { query } from '@angular/core/src/animation/dsl';
@@ -26,7 +26,9 @@ export class FeedPage {
               private loadingCrtl: LoadingController, 
               private toastCtrl: ToastController,
               private camera: Camera,
-              private http: HttpClient) 
+              private http: HttpClient,
+              private actionSheetCtrl: ActionSheetController,
+              private alertCtrl: AlertController) 
   {
     this.getPosts();
   }
@@ -80,7 +82,8 @@ export class FeedPage {
       })
       loading.dismiss();
 
-    this.cursor = this.posts[this.posts.length - 1];      
+    this.cursor = this.posts[this.posts.length - 1];    
+    console.log(this.posts)  
     }).catch((err) => {
       console.log(err);
     })
@@ -135,7 +138,6 @@ export class FeedPage {
     }).catch((err) => {
       console.log(err)
     })
-
   }
 
   // function for updating the post Likes. makes use of Firebase updateLikes function.
@@ -145,14 +147,89 @@ export class FeedPage {
       userId: firebase.auth().currentUser.uid,
       action: post.data().likes && post.data().likes[firebase.auth().currentUser.uid] == true ? "unlike": "like",
     }
+
+
+    let toast = this.toastCtrl.create({
+      message: "Updating Like...Please wait..."
+    }) 
+
+    toast.present();
+
     const urlString = "https://us-central1-feedlyapp-a4d0b.cloudfunctions.net/updateLikesCount";
+    console.log("my post body: ", JSON.stringify(body));
     this.http.post(urlString, JSON.stringify(body), {
       responseType: "text"
     }).subscribe((data) => {
       console.log(data);
+      toast.setMessage("Like updated.");
+      setTimeout(() => {
+        toast.dismiss();
+      }, 3000)
     }, (error) => {
       console.log(error);
+      toast.setMessage("Error occured while updating Likes. Please try again later.");
+      setTimeout(() => {
+        toast.dismiss();
+      }, 3000)      
     })
+  }
+
+
+  comment(post) {
+    this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: "View all Comments",
+          handler: () => {
+            //TODO update handler.
+          }
+        },
+        {
+          text: "New Comment",
+          handler: () => {
+            this.alertCtrl.create({
+              title: "New Comment",
+              message: "Type your comment",
+              inputs: [
+                {
+                  name: "comment",
+                  type: "text"
+                }
+              ],
+              buttons: [
+                {
+                  text: "Cancel"
+                },
+                {
+                  text: "Post",
+                  handler: (data) => {
+                    if (data.comment) {
+                      firebase.firestore().collection("comments").add({
+                        text: data.comment,
+                        post: post.id,
+                        owner: firebase.auth().currentUser.uid,
+                        owner_name: firebase.auth().currentUser.displayName,
+                        created: firebase.firestore.FieldValue.serverTimestamp()
+                      }).then((doc) => {
+                        this.toastCtrl.create({
+                          message: "Comment posted successfully",
+                          duration: 3000
+                        }).present();
+                      }).catch((err) => {
+                        this.toastCtrl.create({
+                          message: err.message,
+                          duration: 3000
+                        }).present();
+                      })
+                    }
+                  }
+                }
+              ]
+            }).present();
+          }
+        }
+      ]
+    }).present();
   }
 
   refresh(event) {

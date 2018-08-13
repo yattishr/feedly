@@ -14,6 +14,7 @@ export class SignupPage {
   name: string = "";
   email: string = "";
   password: string = "";
+  birthday: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController, public alertCtrl: AlertController) {
   }
@@ -24,7 +25,7 @@ export class SignupPage {
 
 
   signup() {
-    console.log(this.name, this.email, this.password);
+    console.log(this.name, this.email, this.password, this.birthday);
     firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
     .then((data) => {
       console.log(data);
@@ -32,7 +33,7 @@ export class SignupPage {
           newUser.updateProfile({
           displayName: this.name,
           photoURL: ""
-          }).then((res) => {
+          }).then((res) => {            
             console.log("Profile updated successfully.")
             console.log(res)
             this.alertCtrl.create({

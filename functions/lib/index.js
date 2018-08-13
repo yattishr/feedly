@@ -56,7 +56,7 @@ exports.updateLikesCount = functions.https.onRequest((request, response) => {
         let likesCount = data.data().likesCount || 0;
         let likes = data.data().likes || [];
         const updateData = {};
-        if (action == "like") {
+        if (action === "like") {
             updateData["likesCount"] = ++likesCount;
             updateData[`likes.${userId}`] = true;
         }
@@ -65,7 +65,7 @@ exports.updateLikesCount = functions.https.onRequest((request, response) => {
             updateData[`likes.${userId}`] = false;
         }
         admin.firestore().collection("posts").doc(postId).update(updateData).then(() => __awaiter(this, void 0, void 0, function* () {
-            if (action == "like") {
+            if (action === "like") {
                 yield sendNotification(data.data().owner, "new_like");
             }
             response.status(200).send("Done");
@@ -86,8 +86,7 @@ exports.updateCommentsCount = functions.firestore.document('comments/{commentId}
         yield admin.firestore().collection("posts").doc(postId).update({
             "commentsCount": commentsCount
         });
-        return sendNotification(doc.data().owner, "new_comment");
-        ;
+        return true;
     }
     else {
         return false;
