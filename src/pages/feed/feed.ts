@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, LoadingController, ToastController, ActionSheetController, AlertController } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController, ActionSheetController, AlertController, ModalController } from 'ionic-angular';
 import firebase from 'firebase';
 import moment from 'moment';
 import { query } from '@angular/core/src/animation/dsl';
 import { LoginPage } from '../login/login';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { CommentsPage } from '../comments/comments';
 
 @Component({
   selector: 'page-feed',
@@ -28,7 +29,8 @@ export class FeedPage {
               private camera: Camera,
               private http: HttpClient,
               private actionSheetCtrl: ActionSheetController,
-              private alertCtrl: AlertController) 
+              private alertCtrl: AlertController,
+              private modalCtrl: ModalController) 
   {
     this.getPosts();
   }
@@ -182,6 +184,9 @@ export class FeedPage {
           text: "View all Comments",
           handler: () => {
             //TODO update handler.
+            this.modalCtrl.create(CommentsPage, {
+              "post": post
+            }).present()
           }
         },
         {
