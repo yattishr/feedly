@@ -7,6 +7,7 @@ import { LoginPage } from '../login/login';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CommentsPage } from '../comments/comments';
+import { Firebase } from '@ionic-native/firebase';
 
 @Component({
   selector: 'page-feed',
@@ -30,15 +31,35 @@ export class FeedPage {
               private http: HttpClient,
               private actionSheetCtrl: ActionSheetController,
               private alertCtrl: AlertController,
-              private modalCtrl: ModalController) 
+              private modalCtrl: ModalController,
+              private firebaseCordova: Firebase) 
   {
     this.getPosts();
+    this.firebaseCordova.getToken().then((token) => {
+      console.log(token);
+      this.updateToken(token, firebase.auth().currentUser.uid)
+    }).catch((err) => {
+      console.log(err);   
+    })
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad FeedPage');
   }
 
+
+  updateToken(token: string, uid: string) {
+    firebase.firestore().collection("users").doc(uid).set({
+      token: token,
+      tokenUpdate: firebase.firestore.FieldValue.serverTimestamp()
+    }, {
+      merge: true
+    }).then(() => {
+      console.log("token saved to cloud firestore");
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
 
   // retrieve the posts from firestore and order posts by created descending order.
   getPosts() {

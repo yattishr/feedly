@@ -13,6 +13,8 @@ import { SignupPage } from '../pages/signup/signup';
 import { FeedPage } from '../pages/feed/feed';
 import { CommentsPage } from '../pages/comments/comments';
 import { Camera } from '@ionic-native/camera';
+import { Firebase } from '@ionic-native/firebase';
+
 
 
   // Initialize Firebase
@@ -52,6 +54,7 @@ import { Camera } from '@ionic-native/camera';
     StatusBar,
     SplashScreen,
     Camera,
+    Firebase,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

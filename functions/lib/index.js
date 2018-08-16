@@ -86,7 +86,7 @@ exports.updateCommentsCount = functions.firestore.document('comments/{commentId}
         yield admin.firestore().collection("posts").doc(postId).update({
             "commentsCount": commentsCount
         });
-        return true;
+        return sendNotification(doc.data().owner, "new_comment");
     }
     else {
         return false;

@@ -37,7 +37,6 @@ export class CommentsPage {
   ago(time) {
     let difference = moment(time).diff(moment());
     return moment.duration(difference).humanize();
-    console.log(time);
   }  
 
 
